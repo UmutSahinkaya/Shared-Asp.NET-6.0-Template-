@@ -25,5 +25,6 @@ namespace Shared.Models
         [Required]
         [StringLength(50)]
         public string Role { get; set; } = "user";
+        public string? Done { get; set; }
     }
 }
