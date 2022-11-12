@@ -4,6 +4,7 @@ using Shared.Entities;
 using System.Diagnostics.Metrics;
 using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Reflection;
 
 namespace Shared
 {
@@ -20,6 +21,7 @@ namespace Shared
                 opts.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
                 //opts.UseLazyLoadingProxies();
             });
+            builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(opts =>
             {

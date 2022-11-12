@@ -16,14 +16,17 @@ namespace Shared.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly DatabaseContext _context;
+        #region Constractor
+         private readonly DatabaseContext _context;
         private readonly IConfiguration _configuration;
         public AccountController(DatabaseContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
         }
-        [AllowAnonymous]
+        #endregion
+        #region Login
+         [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
@@ -65,15 +68,9 @@ namespace Shared.Controllers
             return View(model);
         }
 
-        private string DoMD5HashedString(string s)
-        {
-            string md5Salt = _configuration.GetValue<string>("AppSettings:MD5Salt");
-            string salted = s + md5Salt;
-            string hashed = salted.MD5();
-            return hashed;
-        }
-
-        [AllowAnonymous]
+        #endregion
+        #region Register
+         [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
@@ -108,7 +105,9 @@ namespace Shared.Controllers
             }
             return View(model);
         }
-        public IActionResult Profile()
+        #endregion
+        #region Profile
+         public IActionResult Profile()
         {
             ProfileInfoLoader();
             return View();
@@ -119,6 +118,7 @@ namespace Shared.Controllers
             Guid userid = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
             User user = _context.Users.SingleOrDefault(x => x.Id == userid);
             ViewData["FullName"] = user.FullName;
+            ViewData["ProfileImage"] = user.ProfileImageFileName;
         }
 
         [HttpPost]
@@ -130,6 +130,31 @@ namespace Shared.Controllers
                 User user = _context.Users.SingleOrDefault(x => x.Id == userid);
 
                 user.FullName=fullName;
+                _context.SaveChanges();
+
+                return RedirectToAction(nameof(Profile));
+            }
+            ProfileInfoLoader();
+            return View("Profile");
+        }
+        [HttpPost]
+        public IActionResult ProfileChangeImage([Required]IFormFile file)
+        {
+            if (ModelState.IsValid)
+            {
+                Guid userid = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                User user = _context.Users.SingleOrDefault(x => x.Id == userid);
+
+                //p_guid.jpg
+                string fileName = $"p_{userid}.jpg";
+                //string fileName = $"p_{userid}.{file.ContentType.Split('/')[1]}";
+                Stream stream = new FileStream($"wwwroot/uploads/{fileName}",FileMode.OpenOrCreate);
+                file.CopyTo(stream);
+
+                stream.Close();
+                stream.Dispose();
+
+                user.ProfileImageFileName = fileName;
                 _context.SaveChanges();
 
                 return RedirectToAction(nameof(Profile));
@@ -153,10 +178,20 @@ namespace Shared.Controllers
             ProfileInfoLoader();
             return View("Profile");
         }
-        public IActionResult Logout()
+        #endregion
+        #region LogOut
+         public IActionResult Logout()
         {
            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction(nameof(Login));
+        }
+        #endregion
+         private string DoMD5HashedString(string s)
+        {
+            string md5Salt = _configuration.GetValue<string>("AppSettings:MD5Salt");
+            string salted = s + md5Salt;
+            string hashed = salted.MD5();
+            return hashed;
         }
     }
 }

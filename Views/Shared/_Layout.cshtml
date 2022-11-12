@@ -32,8 +32,11 @@
                         {
                             if (User.IsInRole("admin"))
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">administrator</a>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" asp-action="Index" asp-controller="Admin" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administrator</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a asp-action="Index" asp-controller="User" class="dropdown-item">Users</a></li>
+                                    </ul>
                                 </li>
                             }
 
