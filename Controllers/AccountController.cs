@@ -6,6 +6,7 @@ using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using NETCore.Encrypt.Extensions;
 using Shared.Entities;
+using Shared.Helpers;
 using Shared.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
@@ -19,14 +20,16 @@ namespace Shared.Controllers
         #region Constractor
          private readonly DatabaseContext _context;
         private readonly IConfiguration _configuration;
-        public AccountController(DatabaseContext context, IConfiguration configuration)
+        private readonly IHasher _hasher;
+        public AccountController(DatabaseContext context, IConfiguration configuration, IHasher hasher)
         {
             _context = context;
             _configuration = configuration;
+            _hasher = hasher;
         }
         #endregion
         #region Login
-         [AllowAnonymous]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
@@ -37,7 +40,7 @@ namespace Shared.Controllers
         {
             if (ModelState.IsValid)
             {
-                string hashedPassword = DoMD5HashedString(model.Password);
+                string hashedPassword = _hasher.DoMD5HashedString(model.Password);
                 User user = _context.Users.SingleOrDefault(x => x.Username.ToLower() == model.Username.ToLower() && x.Password == hashedPassword);
                 if (user != null)
                 {
@@ -86,7 +89,7 @@ namespace Shared.Controllers
                     ModelState.AddModelError(nameof(model.Username), "Username is already exists.");
                     View(model);
                 }
-                string hashedPassword = DoMD5HashedString(model.Password);
+                string hashedPassword = _hasher.DoMD5HashedString(model.Password);
                 User user = new()
                 {
                     Username = model.Username,
@@ -169,7 +172,7 @@ namespace Shared.Controllers
             {
                 Guid userid = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 User user = _context.Users.SingleOrDefault(x => x.Id == userid);
-                string hashedPassword = DoMD5HashedString(password);
+                string hashedPassword = _hasher.DoMD5HashedString(password);
                 user.Password = hashedPassword;
                 _context.SaveChanges();
 
@@ -186,12 +189,5 @@ namespace Shared.Controllers
             return RedirectToAction(nameof(Login));
         }
         #endregion
-         private string DoMD5HashedString(string s)
-        {
-            string md5Salt = _configuration.GetValue<string>("AppSettings:MD5Salt");
-            string salted = s + md5Salt;
-            string hashed = salted.MD5();
-            return hashed;
-        }
     }
 }
