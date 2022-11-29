@@ -70,7 +70,6 @@ namespace Shared.Controllers
             }
             return View(model);
         }
-
         #endregion
         #region Register
          [AllowAnonymous]

@@ -1,0 +1,48 @@
+﻿@model List<BookViewModel>
+<table class="table table-hover table-sm">
+    <thead></thead>
+    <tr>
+        <th>BookName</th>
+        <th>BookTitle</th>
+        <th>WriterName</th>
+        <th>DateOfPrint</th>
+        <th>IsStock</th>
+        <th>Stock</th>
+        <th></th>
+    </tr>
+    <tbody>
+        @foreach (BookViewModel book in Model)
+        {
+            <tr>
+                <td>@book.BookName</td>
+                <td>@book.BookTitle</td>
+                <td>@book.WriterName</td>
+                <td>@book.DateOfPrint</td>
+                <td>
+                    @if (book.IsStock == true)
+                    {
+                        <i class="fa fa-check text-success"></i>
+                    }
+                    else
+                    {
+                        <i class="fa fa-times text-danger"></i>
+                    }
+                </td>
+                <td>@book.Stock</td>
+
+                <td class="text-end">
+                    <a asp-action="EditBook" asp-route-id="@book.Id" class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#modalEdit" data-ajax="true" data-ajax-method="get"
+                   data-ajax-update="#modalEditContent">
+                        <i class="fa fa-edit me-2"></i>Edit</a>
+
+                    <a asp-action="DeleteBook" asp-route-id="@book.Id"
+                   data-ajax-confirm="Are you sure want to delete this book: @book.BookName ?"
+                   data-ajax="true" data-ajax-method="get"
+                   data-ajax-update="#panel"
+                   class="btn btn-danger btn-sm"><i class="fa fa-trash me-2"></i>Remove</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
