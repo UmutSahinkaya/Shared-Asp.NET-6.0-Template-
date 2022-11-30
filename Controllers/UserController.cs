@@ -1,21 +1,25 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Entities;
+using Shared.Helpers;
 using Shared.Models;
 
 namespace Shared.Controllers
 {
     public class UserController : Controller
     {
+        #region Constractor
         private readonly DatabaseContext _context;
         private readonly IMapper _mapper;
-
-        public UserController(DatabaseContext context, IMapper mapper)
+        private readonly IHasher _hasher;
+        public UserController(DatabaseContext context, IMapper mapper, IHasher hasher)
         {
             _context = context;
             _mapper = mapper;
+            _hasher = hasher;
         }
-
+        #endregion
+        #region Actions of Get
         public IActionResult Index()
         {
             List<UserViewModel> users =
@@ -33,6 +37,18 @@ namespace Shared.Controllers
             EditUserModel model = _mapper.Map<EditUserModel>(user);
             return View(model);
         }
+        public IActionResult Delete(Guid id)
+        {
+            User user = _context.Users.Find(id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        #endregion
+        #region Actions of Post
         [HttpPost]
         public IActionResult Create(CreateUserModel model)
         {
@@ -44,6 +60,7 @@ namespace Shared.Controllers
                     return View(model);
                 }
                 User user= _mapper.Map<User>(model);
+                user.Password=_hasher.DoMD5HashedString(model.Password);
                 _context.Users.Add(user);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
@@ -67,14 +84,6 @@ namespace Shared.Controllers
             }
             return View(model);
         }
-        public IActionResult Delete(Guid id)
-        {   User user=_context.Users.Find(id);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-            }
-            return RedirectToAction(nameof(Index));
-        }
+        #endregion
     }
 }

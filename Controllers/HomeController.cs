@@ -35,5 +35,14 @@ namespace Shared.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        public IActionResult GetData()
+        {
+            return Json(new { Name = "Umut", Surname = "Şahinkaya" });
+        }
+        [HttpPost]
+        public IActionResult PostData([FromBody]PostDataApiModel model)
+        {
+            return Json(new {Error="false", Message="Success"});
+        }
     }
 }

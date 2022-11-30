@@ -5,6 +5,7 @@ using System.Diagnostics.Metrics;
 using System;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Reflection;
+using Shared.Helpers;
 
 namespace Shared
 {
@@ -32,6 +33,7 @@ namespace Shared
                 opts.LogoutPath = "/Account/Logout";
                 opts.AccessDeniedPath = "/Home/AccessDenied";
             });
+            builder.Services.AddScoped<IHasher, Hasher>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

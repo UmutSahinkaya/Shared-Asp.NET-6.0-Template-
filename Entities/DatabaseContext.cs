@@ -9,5 +9,6 @@ namespace Shared.Entities
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Book> Books { get; set; }
     }
 }
