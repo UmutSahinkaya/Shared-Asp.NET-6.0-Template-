@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Entities;
 using Shared.Helpers;
 using Shared.Models;
+using System.Data;
 
 namespace Shared.Controllers
 {
+    [Authorize(Roles = "Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class UserController : Controller
     {
         #region Constractor

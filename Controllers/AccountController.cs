@@ -14,7 +14,7 @@ using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribut
 
 namespace Shared.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes =CookieAuthenticationDefaults.AuthenticationScheme)]
     public class AccountController : Controller
     {
         #region Constractor
