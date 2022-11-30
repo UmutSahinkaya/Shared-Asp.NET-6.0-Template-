@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Models;
 using System.Diagnostics;
 
 namespace Shared.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -34,6 +35,15 @@ namespace Shared.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        public IActionResult GetData()
+        {
+            return Json(new { Name = "Umut", Surname = "Şahinkaya" });
+        }
+        [HttpPost]
+        public IActionResult PostData([FromBody]PostDataApiModel model)
+        {
+            return Json(new {Error="false", Message="Success"});
         }
     }
 }
